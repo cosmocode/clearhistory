@@ -132,7 +132,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
      */
     function _parseChangesFile($file,$page) {
         if (!is_file($file)) return;
-        if (checklock()) return;
+        if (checklock($page)) return;
         lock($page);
         $content = file_get_contents($file);
         // get page informations
