@@ -27,14 +27,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
      * return some info
      */
     function getInfo(){
-      return array(
-        'author' => 'Dominik Eckelmann',
-        'email'  => 'dokuwiki@cosmocode.de',
-        'date'   => '2008-09-12',
-        'name'   => 'admin plugin to cleanup the history',
-        'desc'   => 'This plugin deletes history entrys that are -> only from one user (not interrupted form another) about 1h.',
-        'url'    => 'http://www.dokuwiki.org/plugin:clearhistory',
-      );
+      return confToHash(dirname(__FILE__).'/info.txt');
     }
 
     /**
