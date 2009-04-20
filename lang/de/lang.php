@@ -23,5 +23,6 @@ letzten Änderungen stehen gesäubert.<br /><br />
 Ist diese Option ausgewählt, wird der gegebene Namensbereich und alle darunter liegenden
 Namensbereiche aufgeräumt. Wenn kein Namensbereich angegeben ist, werden alle Seiten des gesamten Wikis untersucht.<br />
 Diese Option ist mit Vorsicht zu genießen, da sie unter Umständen eine lange Zeit benötigt.';
-
+$lang['onlysmall'] = 'Nur kleine &Auml;nderungen entfernen.';
+$lang['onlynocomment'] = 'Nur &Auml;nderungen ohne Kommentare entfernen.';
 ?>

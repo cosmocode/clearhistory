@@ -25,4 +25,6 @@ This option will check all pages within (and below) the given namespace.
 If no namespace is entered all namespaces will be checked. Use this with caution,
 it can take a long time.';
 
+$lang['onlysmall'] = 'Just remove small changes.';
+$lang['onlynocomment'] = 'Just remove changes without a comment.';
 ?>

@@ -62,7 +62,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 
 
         echo '<h1>'.$this->getLang('name').'</h1>';
-        echo '<form action="doku.php" method="GET"><fieldset style="float:right;margin-right:10px;width:315px;margin-left:10px">';
+        echo '<form action="doku.php" method="GET"><fieldset class="clearhistory">';
         echo '<input type="hidden" name="do" value="admin" />';
         echo '<input type="hidden" name="page" value="clearhistory" />';
 
@@ -73,9 +73,14 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
         echo $this->getLang('clean on namespace');
         echo '</label><br /><input type="text" name="ns" class="edit" />';
         echo '</fieldset><br/>';
+		echo '<fieldset>';
+		echo '<input type="checkbox" name="onlysmall" id="c3" /> <label for="c3">'.$this->getLang('onlysmall').'</label><br />';
+		echo '<input type="checkbox" name="onlynocomment" id="c4" /> <label for="c4">'.$this->getLang('onlynocomment').'</label><br />';
+		echo '</fieldset>';
+
         echo '<input type="submit" value="'.$this->getLang('do').'" class="button" /></fieldset>';
         echo '</form>';
-        echo '<p style="margin-left:30px;">'.$this->getLang('desctext').'</p>';;
+        echo '<p>'.$this->getLang('desctext').'</p>';
     }
 
     /**
@@ -122,14 +127,21 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
     /**
      * Parses a .changes file for deletable pages and deletes them.
      * @param string $file the path to the change file
+	 * @param string $page           wiki pagename
+	 * @param boolean $onlySmall     deletes only small changes
+	 * @param boolean $onlyNoComment deletes only entrys without a comment
      */
     function _parseChangesFile($file,$page) {
         if (!is_file($file)) return;
         if (checklock($page)) return;
+		$onlySmall = false;
+		$onlyNoComment = false;
+		if (isset($_REQUEST['onlysmall']) && $_REQUEST['onlysmall'] == 'on' ) $onlySmall = true;
+		if (isset($_REQUEST['onlynocomment']) && $_REQUEST['onlynocomment'] == 'on' ) $onlyNoComment = true;
         lock($page);
         $content = file_get_contents($file);
         // get page informations
-        $max = preg_match_all('/^([0-9]+)\s+?([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s+?(E|C|D)\s+?(\S+)\s+?(\S*)\s+?(.*)$/im',$content,$match);
+        $max = preg_match_all('/^([0-9]+)\s+?([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s+?(E|C|D|R)\s+?(\S+)\s+?(\S*)\s+?(.*)$/im',$content,$match);
         if ($max <= 1) return;
         // set mark to creation entry
         $cmptime = $match[1][$i]+9999999999;
@@ -139,19 +151,36 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
             $user = (empty($match[5][$i]))?$match[2][$i]:$match[5][$i]; // user or if not logged in ip
             $time = $match[1][$i];
             // Creations arnt touched
-            if (!($match[3][$i] == "E" || $match[3][$i] == "e")) {
+            if ($match[3][$i] != "E" && $match[3][$i] != "e") {
                 $cmpuser = $user;
                 $cmptime = $time;
-                $newcontent = sprintf("%d\t%s\t%s\t%s\t%s\t%s\n",$match[1][$i],$match[2][$i],$match[3][$i],$match[4][$i],$match[5][$i],$match[6][$i]).$newcontent;
+                $newcontent = $this->_addLine($match,$i) . $newcontent;
                 continue;
             }
             // if not the same user -> new mark and continue
             if ($user != $cmpuser) {
                 $cmpuser = $user;
                 $cmptime = $time;
-                $newcontent = sprintf("%d\t%s\t%s\t%s\t%s\t%s\n",$match[1][$i],$match[2][$i],$match[3][$i],$match[4][$i],$match[5][$i],$match[6][$i]).$newcontent;
+                $newcontent = $this->_addLine($match,$i) . $newcontent;
                 continue;
             }
+
+			// if onlySmall is set we just want to handle the small matches
+			if ($onlySmall && $match[3][$i] == 'E') {
+				$cmpuser = $user;
+				$cmptime = $time;
+				$newcontent = $this->_addLine($match,$i) . $newcontent;
+				continue;
+			}
+			
+			// if onlyNoComment is set we pass all lines with a comment
+			if ($onlyNoComment && trim($match[6][$i]) != '') {
+				$cmpuser = $user;
+				$cmptime = $time;
+				$newcontent = $this->_addLine($match,$i) . $newcontent;
+				continue;
+			}
+
             // check the time difference between the entrys
             if ( $cmptime-(60*60) < $time ) {
                 @unlink(wikiFN($match[4][$i],$time));
@@ -159,11 +188,15 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
                 continue;
             }
             $cmptime = $time;
-            $newcontent = sprintf("%d\t%s\t%s\t%s\t%s\t%s\n",$match[1][$i],$match[2][$i],$match[3][$i],$match[4][$i],$match[5][$i],$match[6][$i]).$newcontent;
+            $newcontent = $this->_addLine($match,$i) . $newcontent;
         }
         unlock($page);
         io_saveFile($file,$newcontent);
     }
+
+	function _addLine($match,$i) {
+		return $match[0][$i]."\n";
+	}
 
     function forAdminOnly() {
         return true;

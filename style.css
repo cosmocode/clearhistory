@@ -1,0 +1,11 @@
+div.page form fieldset fieldset {
+	text-align:left;
+}
+fieldset.clearhistory {
+	float:right;margin-right:10px;width:315px;margin-left:20px;
+}
+
+div.dokuwiki div.page p {
+	margin-right:350px;
+	margin-left:30px;
+}
