@@ -42,11 +42,14 @@ class action_plugin_clearhistory extends DokuWiki_Action_Plugin {
 
     function cleanup(&$event, $param) {
         global $conf;
+
+        $onlySmall     = $this->getConf('autoclearonlysmall');
+        $onlyNoComment = $this->getConf('autoclearonlynocomment');
         if ($this->run) return;
         $this->run = true;
         $hdl = plugin_load('admin','clearhistory');
         $hdl = new admin_plugin_clearhistory();
-        $hdl->_scanRecents();
+        $hdl->_scanRecents($onlySmall , $onlyNoComment);
         touch($conf['cachedir'].'/lastclean');
     }
 

@@ -41,12 +41,18 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
      * handle user request
      */
     function handle() {
+
+        $onlySmall = false;
+        $onlsNoComment = false;
+        if (isset($_REQUEST['onlysmall']) && $_REQUEST['onlysmall'] == 'on' ) $onlySmall = true;
+        if (isset($_REQUEST['onlynocomment']) && $_REQUEST['onlynocomment'] == 'on' ) $onlyNoComment = true;
+
         if (isset($_GET['clear'])) {
             if ($_GET['clear'] == 1) {
-                $this->_scanRecents();
+                $this->_scanRecents( $onlySmall , $onlyNoComment );
             } else if ($_GET['clear'] == 2) {
                 $_GET['ns'] = cleanID($_GET['ns']);
-                $this->_scan($_GET['ns']);
+                $this->_scan($_GET['ns'] , $onlysmall , $onlyNoComment );
             }
             msg(sprintf($this->getLang('deleted'),$this->delcounter),1);
         }
@@ -74,8 +80,8 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
         echo '</label><br /><input type="text" name="ns" class="edit" />';
         echo '</fieldset><br/>';
 		echo '<fieldset>';
-		echo '<input type="checkbox" name="onlysmall" id="c3" /> <label for="c3">'.$this->getLang('onlysmall').'</label><br />';
-		echo '<input type="checkbox" name="onlynocomment" id="c4" /> <label for="c4">'.$this->getLang('onlynocomment').'</label><br />';
+		echo '<input type="checkbox" name="onlysmall" id="c3" '. ($this->getConf('autoclearonlysmall')?'checked="checked"':'') .'  /> <label for="c3">'.$this->getLang('onlysmall').'</label><br />';
+		echo '<input type="checkbox" name="onlynocomment" id="c4" '. ($this->getConf('autoclearonlynocomment')?'checked="checked"':'') .' /> <label for="c4">'.$this->getLang('onlynocomment').'</label><br />';
 		echo '</fieldset>';
 
         echo '<input type="submit" value="'.$this->getLang('do').'" class="button" /></fieldset>';
@@ -116,11 +122,11 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
      * Scans the recent changed files for changes
      * @param int $num number of last changed files
      */
-    function _scanRecents($num = 30) {
+    function _scanRecents( $num = 30, $onlySmall = false , $onlyNoComment = false ) {
         $recents = getRecents(0,$num);
         $this->delcounter = 0;
         foreach ($recents as $recent) {
-            $this->_parseChangesFile(metaFN($recent['id'],'.changes'),$recent['id']);
+            $this->_parseChangesFile(metaFN($recent['id'],'.changes'),$recent['id'], $onlySmall, $onlyNoComment);
         }
     }
 
@@ -131,13 +137,10 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 	 * @param boolean $onlySmall     deletes only small changes
 	 * @param boolean $onlyNoComment deletes only entrys without a comment
      */
-    function _parseChangesFile($file,$page) {
+    function _parseChangesFile( $file , $page , $onlySmall = false , $onlyNoComment = false ) {
         if (!is_file($file)) return;
         if (checklock($page)) return;
-		$onlySmall = false;
-		$onlyNoComment = false;
-		if (isset($_REQUEST['onlysmall']) && $_REQUEST['onlysmall'] == 'on' ) $onlySmall = true;
-		if (isset($_REQUEST['onlynocomment']) && $_REQUEST['onlynocomment'] == 'on' ) $onlyNoComment = true;
+
         lock($page);
         $content = file_get_contents($file);
         // get page informations
