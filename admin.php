@@ -86,7 +86,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 
         echo '<input type="submit" value="'.$this->getLang('do').'" class="button" /></fieldset>';
         echo '</form>';
-        echo '<p>'.$this->getLang('desctext').'</p>';
+        echo '<p class="clearhistory">'.$this->getLang('desctext').'</p>';
     }
 
     /**
