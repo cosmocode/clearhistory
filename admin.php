@@ -49,10 +49,10 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 
         if (isset($_GET['clear'])) {
             if ($_GET['clear'] == 1) {
-                $this->_scanRecents( $onlySmall , $onlyNoComment );
+                $this->_scanRecents( 30 , $onlySmall , $onlyNoComment );
             } else if ($_GET['clear'] == 2) {
                 $_GET['ns'] = cleanID($_GET['ns']);
-                $this->_scan($_GET['ns'] , $onlysmall , $onlyNoComment );
+                $this->_scan($_GET['ns'] , $onlySmall , $onlyNoComment );
             }
             msg(sprintf($this->getLang('deleted'),$this->delcounter),1);
         }
@@ -124,6 +124,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
      */
     function _scanRecents( $num = 30, $onlySmall = false , $onlyNoComment = false ) {
         $recents = getRecents(0,$num);
+		
         $this->delcounter = 0;
         foreach ($recents as $recent) {
             $this->_parseChangesFile(metaFN($recent['id'],'.changes'),$recent['id'], $onlySmall, $onlyNoComment);
@@ -140,7 +141,6 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
     function _parseChangesFile( $file , $page , $onlySmall = false , $onlyNoComment = false ) {
         if (!is_file($file)) return;
         if (checklock($page)) return;
-
         lock($page);
         $content = file_get_contents($file);
         // get page informations
