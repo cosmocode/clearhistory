@@ -30,7 +30,7 @@ class action_plugin_clearhistory extends DokuWiki_Action_Plugin {
      * return some info
      */
     function getInfo(){
-        return confToHash(dirname(__FILE__).'/info.txt');
+        return confToHash(dirname(__FILE__).'/plugin.info.txt');
     }
 
     /**
