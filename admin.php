@@ -52,7 +52,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
                 $this->_scanRecents( 30 , $onlySmall , $onlyNoComment );
             } else if ($_GET['clear'] == 2) {
                 $_GET['ns'] = cleanID($_GET['ns']);
-                $this->_scan($_GET['ns'] , $onlySmall , $onlyNoComment );
+                $this->_scanNamespace($_GET['ns'] , $onlySmall , $onlyNoComment );
             }
             msg(sprintf($this->getLang('deleted'),$this->delcounter),1);
         }
@@ -89,11 +89,17 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
         echo '<p class="clearhistory">'.$this->getLang('desctext').'</p>';
     }
 
+	function _scanNamespace($ns, $onlySmall = false, $onlyNoComment = false) {
+		$this->delcounter = 0;
+		$this->_scan($ns, $onlySmall, $onlyNoComment);
+	}
+
+
     /**
      * Scans namespaces for deletable revisions
      * @param string ns the namespace to search in
      */
-    function _scan($ns = '') {
+    function _scan($ns = '', $onlySmall = false, $onlyNoComment = false) {
         $dir = preg_replace('/\.txt(\.gz)?/i','', wikiFN($ns));
         $dir = rtrim($dir,'/');
         if (!is_dir($dir)) return;
@@ -102,7 +108,6 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
             echo 'error';
             return;
         }
-        $this->delcounter = 0;
         while (($file = readdir($dh)) !== false) {
             if ($file == '.' || $file == '..' ) continue;
             if (is_dir($dir.'/'.$file)) {
@@ -112,7 +117,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
             if ($file[0] == '_') continue;
             if (substr($file,-4) == '.txt') {
                 $name = substr($file,0,-4);
-                $this->_parseChangesFile(metaFN($ns.':'.$name,'.changes'),$ns.':'.$name);
+                $this->_parseChangesFile(metaFN($ns.':'.$name,'.changes'),$ns.':'.$name, $onlySmall, $onlyNoComment);
             }
         }
         closedir($dh);
