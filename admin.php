@@ -7,9 +7,12 @@ require_once(DOKU_INC.'inc/pageutils.php');
 require_once(DOKU_INC.'inc/changelog.php');
 require_once(DOKU_INC.'inc/io.php');
 require_once(DOKU_INC.'inc/common.php');
+
 /**
- * All DokuWiki plugins to extend the admin function
- * need to inherit from this class
+ * This plugin is used to cleanup the history
+ *
+ * @see http://dokuwiki.org/plugin:clearhistory
+ * @author Dominik Eckelmann <deckelmann@gmail.com>
  */
 class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 
@@ -21,10 +24,15 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
      */
     var $pages = array();
 
+	/**
+	 * counts deleted pages for a run
+	 */
     var $delcounter = 0;
 
     /**
-     * return some info
+     * return some information about the plugin
+	 *
+	 * @return array
      */
     function getInfo(){
       return confToHash(dirname(__FILE__).'/plugin.info.txt');
@@ -32,16 +40,19 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 
     /**
      * return sort order for position in admin menu
+	 *
+	 * @return integer
      */
     function getMenuSort() {
       return 999;
     }
 
     /**
-     * handle user request
+     * handle the request befor html output
+	 *
+	 * @see html()
      */
     function handle() {
-
         $onlySmall = false;
         $onlsNoComment = false;
         if (isset($_REQUEST['onlysmall']) && $_REQUEST['onlysmall'] == 'on' ) $onlySmall = true;
@@ -59,14 +70,9 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
     }
 
     /**
-     * output appropriate html
+     * output html for the admin page
      */
     function html() {
-        //$this->_scanRecents();
-        //$this->_scan();
-
-
-
         echo '<h1>'.$this->getLang('name').'</h1>';
         echo '<form action="doku.php" method="GET"><fieldset class="clearhistory">';
         echo '<input type="hidden" name="do" value="admin" />';
@@ -89,6 +95,13 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
         echo '<p class="clearhistory">'.$this->getLang('desctext').'</p>';
     }
 
+	/**
+	 * Scans throu a namespace and count the deleted pages in $this->delcounter
+	 *
+     * @param string	$ns 			the namespace to search in
+	 * @param boolean	$onlySmall 		only delete small changes on true
+	 * @param boolean	$onlyNoComment	don't delete changes with a comment on true
+	 */
 	function _scanNamespace($ns, $onlySmall = false, $onlyNoComment = false) {
 		$this->delcounter = 0;
 		$this->_scan($ns, $onlySmall, $onlyNoComment);
@@ -97,7 +110,10 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 
     /**
      * Scans namespaces for deletable revisions
-     * @param string ns the namespace to search in
+	 *
+     * @param string	$ns				the namespace to search in
+	 * @param boolean	$onlySmall 		only delete small changes on true
+	 * @param boolean	$onlyNoComment	don't delete changes with a comment on true
      */
     function _scan($ns = '', $onlySmall = false, $onlyNoComment = false) {
         $dir = preg_replace('/\.txt(\.gz)?/i','', wikiFN($ns));
@@ -125,11 +141,14 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 
     /**
      * Scans the recent changed files for changes
-     * @param int $num number of last changed files
+	 *
+     * @param int 		$num 			number of last changed files to scan
+	 * @param boolean	$onlySmall 		only delete small changes on true
+	 * @param boolean	$onlyNoComment	don't delete changes with a comment on true
      */
     function _scanRecents( $num = 30, $onlySmall = false , $onlyNoComment = false ) {
         $recents = getRecents(0,$num);
-		
+
         $this->delcounter = 0;
         foreach ($recents as $recent) {
             $this->_parseChangesFile(metaFN($recent['id'],'.changes'),$recent['id'], $onlySmall, $onlyNoComment);
@@ -138,10 +157,11 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 
     /**
      * Parses a .changes file for deletable pages and deletes them.
-     * @param string $file the path to the change file
-	 * @param string $page           wiki pagename
-	 * @param boolean $onlySmall     deletes only small changes
-	 * @param boolean $onlyNoComment deletes only entrys without a comment
+	 *
+     * @param string	$file			the path to the change file
+	 * @param string	$page			wiki pagename
+	 * @param boolean	$onlySmall		deletes only small changes
+	 * @param boolean	$onlyNoComment	deletes only entrys without a comment
      */
     function _parseChangesFile( $file , $page , $onlySmall = false , $onlyNoComment = false ) {
         if (!is_file($file)) return;
@@ -180,7 +200,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 				$newcontent = $this->_addLine($match,$i) . $newcontent;
 				continue;
 			}
-			
+
 			// if onlyNoComment is set we pass all lines with a comment
 			if ($onlyNoComment && trim($match[6][$i]) != '') {
 				$cmpuser = $user;
@@ -206,10 +226,20 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
 		return $match[0][$i]."\n";
 	}
 
+	/**
+	 * shows that this function is accessible only by admins
+	 *
+	 * @return true
+	 */
     function forAdminOnly() {
         return true;
     }
 
+	/**
+	 * returns the name in the menu
+	 *
+	 * @return Menu name for the plugin
+	 */
     function getMenuText($lang) {
         return $this->getLang('menu');
     }
