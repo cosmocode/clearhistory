@@ -11,7 +11,7 @@ require_once(DOKU_INC.'inc/common.php');
 /**
  * This plugin is used to cleanup the history
  *
- * @see http://dokuwiki.org/plugin:clearhistory
+ * @see    http://dokuwiki.org/plugin:clearhistory
  * @author Dominik Eckelmann <deckelmann@gmail.com>
  */
 class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin {
