@@ -1,7 +1,7 @@
 base    clearhistory
 author  Dominik Eckelmann
 email   dokuwiki@cosmocode.de
-date    2014-05-13
+date    2014-08-05
 name    Remove irrelevant entries from the change history
 desc    This plugin deletes consecutive history entrys that were made by the same user user within 1 hour
 url     http://www.dokuwiki.org/plugin:clearhistory
