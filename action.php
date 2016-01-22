@@ -50,7 +50,7 @@ class action_plugin_clearhistory extends DokuWiki_Action_Plugin {
 	 *
 	 * we need hook the indexer to trigger the cleanup
      */
-    function register(&$controller) {
+    function register(Doku_Event_Handler $controller) {
         $controller->register_hook('INDEXER_TASKS_RUN', 'BEFORE',  $this, 'cleanup', array());
     }
 
