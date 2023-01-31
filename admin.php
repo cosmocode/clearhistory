@@ -195,7 +195,8 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin
 
             // check the time difference between the entrys
             if ($cmptime - (60 * 60) < $time) {
-                @unlink(wikiFN($match[4][$i], $time));
+                @unlink(wikiFN($match[4][$i], $time)); //try the original name
+                @unlink(wikiFN($match[4][$max - 1], $time));  //try the latest name (move plugin) issue #1
                 $this->delcounter++;
                 continue;
             }
