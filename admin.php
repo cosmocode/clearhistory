@@ -30,7 +30,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin
     public function handle()
     {
         $onlySmall = false;
-        $onlsNoComment = false;
+        $onlyNoComment = false;
         if (isset($_REQUEST['onlysmall']) && $_REQUEST['onlysmall'] == 'on') $onlySmall = true;
         if (isset($_REQUEST['onlynocomment']) && $_REQUEST['onlynocomment'] == 'on') $onlyNoComment = true;
 
@@ -152,11 +152,11 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin
         lock($page);
         $content = file_get_contents($file);
         // get page informations
-        $max = preg_match_all('/^([0-9]+)\s+?([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s+?(E|C|D|R)\s+?(\S+)\s+?(\S*)\s+?(.*)$/im',
+        $max = preg_match_all('/^([0-9]+)\s+?([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s+?([ECDR])\s+?(\S+)\s+?(\S*)\s+?(.*)$/im',
             $content, $match);
         if ($max <= 1) return;
         // set mark to creation entry
-        $cmptime = $match[1][$i] + 9999999999;
+        $cmptime = $match[1][0] + 9999999999;
         $cmpuser = (empty($match[5][$max - 1])) ? $match[2][$max - 1] : $match[5][$max - 1]; // user or if not logged in ip
         $newcontent = '';
         for ($i = $max - 1; $i >= 0; $i--) {
@@ -206,6 +206,13 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin
         io_saveFile($file, $newcontent);
     }
 
+    /**
+     * Return a line from the set of regex matches, terminated with a newline char
+     *
+     * @param array $match
+     * @param int $i
+     * @return string
+     */
     protected function _addLine($match, $i)
     {
         return $match[0][$i] . "\n";
