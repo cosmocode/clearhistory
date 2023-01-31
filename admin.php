@@ -152,7 +152,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin
         lock($page);
         $content = file_get_contents($file);
         // get page informations
-        $max = preg_match_all('/^([0-9]+)\s+?([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s+?([ECDR])\s+?(\S+)\s+?(\S*)\s+?(.*)$/im',
+        $max = preg_match_all('/^([0-9]+)\s+?(\S+)\s+?([ECDR])\s+?(\S+)\s+?(\S*)\s+?(.*)$/im',
             $content, $match);
         if ($max <= 1) return;
         // set mark to creation entry
