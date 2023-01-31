@@ -53,7 +53,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin
     public function html()
     {
         echo '<h1>' . $this->getLang('name') . '</h1>';
-        echo '<form action="doku.php" method="GET"><fieldset class="clearhistory">';
+        echo '<form action="' . wl() . '" method="GET"><fieldset class="clearhistory">';
         echo '<input type="hidden" name="do" value="admin" />';
         echo '<input type="hidden" name="page" value="clearhistory" />';
 
