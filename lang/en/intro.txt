@@ -1,0 +1,15 @@
+This plugin allows you to clean up the history.
+
+It deletes all page revisions that have been made by the same user within a one-hour timeframe.
+
+**Clean on recent changes:**
+
+When this option is selected, only the pages contained in the list of the most
+recent changes are checked.
+
+**Clean on namespace:**
+
+This option will check all pages within (and below) the given namespace.
+If no namespace is entered all namespaces will be checked.
+
+Use this with caution, it can take a long time.

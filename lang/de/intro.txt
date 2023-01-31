@@ -1,0 +1,15 @@
+Dieses Plugin hilft ihnen, die Änderungshistorie ihres Wikis sauber zu halten.
+
+Das Plugin löscht alte Zwischenversionen, die von nur einem Benutzer bearbeitet wurden,
+wenn die einzelnen Änderungen in einem Abstand von weniger als einer Stunde durchgeführt wurden.
+
+**Aufräumen anhand der letzten Änderungen:**
+
+Wenn diese Option ausgewählt ist, werden nur die Seiten welche in der Liste der letzten Änderungen stehen, gesäubert.
+
+**Aufräumen nach Namensräumen**
+
+Ist diese Option ausgewählt, wird der gegebene Namensraum und alle darunter liegenden
+Namensräume aufgeräumt. Wenn kein Namensbereich angegeben ist, werden alle Seiten des gesamten Wikis untersucht.
+
+Diese Option ist mit Vorsicht zu genießen, da sie unter Umständen eine lange Zeit benötigt.

@@ -52,7 +52,7 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin
      */
     public function html()
     {
-        echo '<h1>' . $this->getLang('name') . '</h1>';
+        echo '<h1>' . $this->getLang('menu') . '</h1>';
         echo '<form action="' . wl() . '" method="GET"><fieldset class="clearhistory">';
         echo '<input type="hidden" name="do" value="admin" />';
         echo '<input type="hidden" name="page" value="clearhistory" />';
@@ -71,7 +71,8 @@ class admin_plugin_clearhistory extends DokuWiki_Admin_Plugin
 
         echo '<input type="submit" value="' . $this->getLang('do') . '" class="button" /></fieldset>';
         echo '</form>';
-        echo '<p class="clearhistory">' . $this->getLang('desctext') . '</p>';
+
+        echo '<div class="clearhistory">' . $this->locale_xhtml('intro') . '</div>';
     }
 
     /**
